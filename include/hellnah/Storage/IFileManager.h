@@ -6,8 +6,8 @@
 class IFileManager
 {
 public:
-    virtual ~IFileManager() = default;
+    ~IFileManager();
 
-    virtual int Read() = 0;
-    virtual int write() = 0;
+    int Read();
+    int write();
 };

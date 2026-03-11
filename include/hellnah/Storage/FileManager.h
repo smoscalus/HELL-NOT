@@ -6,13 +6,14 @@
 class FileManager : public IFileManager
 {
     WorkFile _workFile;
+
 private:
-    FileManager(const char* path) : _workFile(path) {};
-public: 
-    static FileManager InitFile(const char* path)
+    FileManager(const char *path) : _workFile(path) {};
+
+public:
+    static FileManager InitFile(const char *path)
     {
+        // validation
         return FileManager(path);
     };
-    int Read() override;
-    int write() override;
 };
