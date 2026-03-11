@@ -8,6 +8,7 @@ class IFileManager
 public:
     ~IFileManager();
 
+    int Write();
     int Read();
-    int write();
+    void Delete();
 };
