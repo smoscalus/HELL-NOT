@@ -4,17 +4,15 @@
 
 #include <cstring>
 
-using namespace Storage::FileStorage;
-
 WorkFile::WorkFile(const char *path)
 {
-    if (!is_exists_file(path))
+    if (!Storage::FileStorage::is_exists_file(path))
     {
-        create_file(path);
+        Storage::FileStorage::create_file(path);
     }
     else
     {
-        read_file(path);
+        Storage::FileStorage::read_file(path);
     }
 
     strcpy(Value, path);

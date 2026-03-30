@@ -6,8 +6,8 @@
 #include <fstream>
 #include <cstring>
 
-using namespace Storage::FileStorage;
-
+namespace Storage
+{
 int FileStorage::is_exists_file(const char *path)
 {
     std::fstream file(path, std::ios::in | std::ios::binary);
@@ -42,4 +42,5 @@ void FileStorage::read_file(const char *path)
     {
         throw std::runtime_error("Файл не является HELLNAH базой!");
     }
+}
 }
