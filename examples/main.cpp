@@ -11,5 +11,7 @@ struct student
 
 int main()
 {
-    Database("students.hellnot");
+    auto db = Database("students.hellnot");
+
+    auto students = db.open_table<student>("students");
 }

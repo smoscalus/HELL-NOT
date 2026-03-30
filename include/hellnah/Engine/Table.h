@@ -1,15 +1,16 @@
 #pragma once
 
 #include "../Storage/FileStorage.h"
+#include "../Core/WorkFile.h"
 
 template <typename T>
 class Table
 {
-    FileStorage _fileStorage;
-
-    Table(const char *path)
+    
+public: 
+    Table(WorkFile WorkFile)
     {
-        _fileStorage.OpenFile(path);
+        
     }
 
     T insert(T);
