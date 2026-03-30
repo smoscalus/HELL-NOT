@@ -2,6 +2,8 @@
 
 #include "../Storage/FileStorage.h"
 #include "../Core/WorkFile.h"
+#include "../Core/DbHeader.h"
+#include "../Core/RecordHeader.h"
 
 #include <fstream>
 
@@ -29,7 +31,27 @@ public:
 
         return id;
     }
-    T get(T);
+
+    T get(int id)
+    {
+        const char* path = _workFile.getValue();
+        uint64_t offset = sizeof(Core::DbHeader) + (id - 1) * (sizeof(Core::RecordHeader) + sizeof(T));
+        
+        std::fstream file(_workFile.getValue(), std::ios::binary | std::ios::in);
+        file.seekg(offset, std::ios::beg);
+
+        Core::RecordHeader header;
+        file.read(reinterpret_cast<char*>(&header), sizeof(header));
+
+        if (header.isDeleted == 1)
+        {
+            throw std::runtime_error("Record deleted");
+        }
+
+        T value;
+        file.read(reinterpret_cast<char*>(&value), sizeof(T));
+        return value;
+    }
     void remove(T);
 };
 }
