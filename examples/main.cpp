@@ -17,7 +17,7 @@ int main()
     auto students = db.open_table<student>("students");
 
     auto id = students.insert(s);
-    auto student = students.get(1);
+    auto student = students.get(id);
 
     int i;
     while (student.Value[i] != '\0'){
@@ -25,4 +25,6 @@ int main()
         i++;
     }
     cout << student.age;
+
+    students.remove(1);
 }

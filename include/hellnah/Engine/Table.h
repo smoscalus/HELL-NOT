@@ -9,49 +9,68 @@
 
 namespace Engine
 {
-template <typename T>
-class Table
-{
-    Core::WorkFile& _workFile;
-
-public:
-    Table(Core::WorkFile& workFile) : _workFile(workFile) {}
-
-    int insert(T obj)
+    template <typename T>
+    class Table
     {
-        const char* path = _workFile.getValue();
-        size_t size = sizeof(obj);
+        Core::WorkFile &_workFile;
 
-        std::ofstream file(path, std::ios::binary | std::ios::app);
+    public:
+        Table(Core::WorkFile &workFile) : _workFile(workFile) {}
 
-        int id = Storage::FileStorage::add(path, size);
-        file.write(reinterpret_cast<const char*>(&obj), size);
-
-        file.close();
-
-        return id;
-    }
-
-    T get(int id)
-    {
-        const char* path = _workFile.getValue();
-        uint64_t offset = sizeof(Core::DbHeader) + (id - 1) * (sizeof(Core::RecordHeader) + sizeof(T));
-        
-        std::fstream file(_workFile.getValue(), std::ios::binary | std::ios::in);
-        file.seekg(offset, std::ios::beg);
-
-        Core::RecordHeader header;
-        file.read(reinterpret_cast<char*>(&header), sizeof(header));
-
-        if (header.isDeleted == 1)
+        int insert(T obj)
         {
-            throw std::runtime_error("Record deleted");
+            const char *path = _workFile.getValue();
+            size_t size = sizeof(obj);
+
+            std::ofstream file(path, std::ios::binary | std::ios::app);
+
+            int id = Storage::FileStorage::add(path, size);
+            file.write(reinterpret_cast<const char *>(&obj), size);
+
+            file.close();
+
+            return id;
         }
 
-        T value;
-        file.read(reinterpret_cast<char*>(&value), sizeof(T));
-        return value;
-    }
-    void remove(T);
-};
+        T get(int id)
+        {
+            uint64_t offset = sizeof(Core::DbHeader) + (id - 1) * (sizeof(Core::RecordHeader) + sizeof(T));
+
+            std::fstream file(_workFile.getValue(), std::ios::binary | std::ios::in);
+            file.seekg(offset, std::ios::beg);
+
+            Core::RecordHeader header;
+            file.read(reinterpret_cast<char *>(&header), sizeof(header));
+
+            if (header.isDeleted == 1)
+            {
+                throw std::runtime_error("Record deleted: get");
+            }
+
+            T value;
+            file.read(reinterpret_cast<char *>(&value), sizeof(T));
+            return value;
+        }
+
+        void remove(int id)
+        {
+            uint64_t offset = sizeof(Core::DbHeader) + (id - 1) * (sizeof(Core::RecordHeader) + sizeof(T));
+
+            std::fstream file(_workFile.getValue(), std::ios::binary | std::ios::in | std::ios::out);
+            file.seekg(offset, std::ios::beg);
+
+            Core::RecordHeader header;
+            file.read(reinterpret_cast<char *>(&header), sizeof(header));
+
+            if(header.isDeleted == 1)
+            {
+                throw std::runtime_error("Record deleted: remove");
+            }
+
+            header.isDeleted = 1;
+
+            file.seekp(offset, std::ios::beg);
+            file.write(reinterpret_cast<char*>(&header), sizeof(header));
+        }
+    };
 }
