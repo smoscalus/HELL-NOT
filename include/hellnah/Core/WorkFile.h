@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 namespace Core
 {
     struct WorkFile
@@ -8,12 +10,13 @@ namespace Core
         char path[256];
         size_t size;
 
+    public:
+        WorkFile(const char *path);
+
         void create_file(const char *path);
         void read_file(const char *path);
         int is_exists_file(const char *path);
 
-    public:
-        WorkFile(const char *path);
         void set_size(size_t size)
         {
             this->size = size;
