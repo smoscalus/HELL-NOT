@@ -6,6 +6,7 @@
 #include "../Core/RecordHeader.h"
 
 #include <fstream>
+#include <iostream>
 
 namespace Engine
 {
@@ -13,18 +14,19 @@ namespace Engine
     class Table
     {
         Core::WorkFile &_workFile;
+        Storage::FileStorage &_fileStorage;
 
     public:
-        Table(Core::WorkFile &workFile) : _workFile(workFile) {}
+        Table(Core::WorkFile &workFile, Storage::FileStorage &fileStorage) : _workFile(workFile), _fileStorage(fileStorage) {}
 
         uint64_t insert(T obj)
         {
-            const char *path = _workFile.getValue();
-            size_t size = sizeof(obj);
+            const char *path = _workFile.get_path();
+            size_t size = _workFile.get_size();
 
             std::ofstream file(path, std::ios::binary | std::ios::app);
 
-            uint64_t id = Storage::FileStorage::add_record(path, size);
+            uint64_t id = _fileStorage.add_record();
             file.write(reinterpret_cast<const char *>(&obj), size);
 
             file.close();
@@ -36,20 +38,20 @@ namespace Engine
         {
             uint64_t offset = sizeof(Core::DbHeader) + (id - 1) * (sizeof(Core::RecordHeader) + sizeof(T));
 
-            std::fstream file(_workFile.getValue(), std::ios::binary | std::ios::in);
+            std::fstream file(_workFile.get_path(), std::ios::binary | std::ios::in);
             file.seekg(offset, std::ios::beg);
 
             Core::RecordHeader header;
             file.read(reinterpret_cast<char *>(&header), sizeof(header));
 
-            if (header.isDeleted == 1)
+            if (!file)
             {
-                throw std::runtime_error("Record deleted");
+                throw std::runtime_error("File is broke");
             }
-            
-            if (header.id == 0)
+
+            if (header.id == 0 || header.isDeleted == 1)
             {
-                throw std::runtime_error("no record");
+                throw std::runtime_error("Record is broke");
             }
 
             T value;
@@ -61,15 +63,20 @@ namespace Engine
         {
             uint64_t offset = sizeof(Core::DbHeader) + (id - 1) * (sizeof(Core::RecordHeader) + sizeof(T));
 
-            std::fstream file(_workFile.getValue(), std::ios::binary | std::ios::in | std::ios::out);
+            std::fstream file(_workFile.get_path(), std::ios::binary | std::ios::in | std::ios::out);
             file.seekg(offset, std::ios::beg);
 
             Core::RecordHeader header;
             file.read(reinterpret_cast<char *>(&header), sizeof(header));
 
-            if (header.isDeleted == 1)
+            if (!file)
             {
-                throw std::runtime_error("Record deleted");
+                throw std::runtime_error("File is broke");
+            }
+
+            if (header.id == 0 || header.isDeleted == 1)
+            {
+                throw std::runtime_error("Record is broke");
             }
 
             header.isDeleted = 1;
