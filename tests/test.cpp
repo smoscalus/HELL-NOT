@@ -11,9 +11,10 @@ struct student
 TEST_CASE("Insert works") {
 
     auto db = Engine::Database("test_students.hellnot");
-
     auto students = db.open_table<student>("students");
 
+    students.clear_database();
+    
     auto id = students.insert({"Alex", 20});
     auto student = students.get(id);
 

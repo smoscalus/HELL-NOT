@@ -26,7 +26,7 @@ namespace Engine
             std::string file_name_s = std::string(table_name) + ".hellnot";
             const char *file_name = file_name_s.c_str();
 
-            if (_workFile.is_exists_file(file_name) == 0)
+            if (_workFile.is_exists_file() == 0)
             {
                 throw std::runtime_error(std::string("Table file does not exist: ") + file_name);
             }

@@ -101,5 +101,10 @@ namespace Engine
             file.seekp(offset, std::ios::beg);
             file.write(reinterpret_cast<char *>(&header), sizeof(header));
         }
+
+        void clear_database()
+        {
+            _workFile.create_file();
+        }
     };
 }

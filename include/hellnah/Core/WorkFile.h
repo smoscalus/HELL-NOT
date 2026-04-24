@@ -13,9 +13,9 @@ namespace Core
     public:
         WorkFile(const char *path);
 
-        void create_file(const char *path);
-        void read_file(const char *path);
-        int is_exists_file(const char *path);
+        void create_file();
+        void read_file();
+        int is_exists_file();
 
         void set_size(size_t size)
         {
