@@ -30,3 +30,16 @@ target_include_directories(hellnah_db PUBLIC include)
 add_executable(example_app examples/main.cpp)
 
 target_link_libraries(example_app PRIVATE hellnah_db)
+
+# ========================
+# Tests
+# ========================
+enable_testing()
+
+add_executable(tests
+    tests/test.cpp
+)
+
+target_link_libraries(tests PRIVATE hellnah_db)
+
+add_test(NAME hellnah_tests COMMAND tests)

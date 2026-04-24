@@ -18,7 +18,12 @@ namespace Engine
         Storage::FileStorage &_fileStorage;
 
     public:
-        Table(Core::WorkFile &workFile, Storage::FileStorage &fileStorage, Core::Id &id) : _workFile(workFile), _fileStorage(fileStorage), _id(id) {}
+        uint64_t quantity;
+
+        Table(Core::WorkFile &workFile, Storage::FileStorage &fileStorage, Core::Id &id) : _workFile(workFile), _fileStorage(fileStorage), _id(id) 
+        {
+            quantity = _id.get_id();
+        }
 
         uint64_t insert(T obj)
         {
@@ -28,6 +33,7 @@ namespace Engine
             std::ofstream file(path, std::ios::binary | std::ios::app);
 
             uint64_t id = _fileStorage.add_record();
+            quantity++;
             file.write(reinterpret_cast<const char *>(&obj), size);
 
             file.close();
@@ -91,7 +97,7 @@ namespace Engine
             }
 
             header.isDeleted = 1;
-
+            quantity--;
             file.seekp(offset, std::ios::beg);
             file.write(reinterpret_cast<char *>(&header), sizeof(header));
         }
